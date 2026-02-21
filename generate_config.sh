@@ -10,13 +10,18 @@ if test -f "Revolt.toml"; then
     done
 fi
 
+turn_secret=$(openssl rand -hex 24)
+
 # set hostname for Caddy and vite variables
 echo "HOSTNAME=https://$1" > .env.web
+echo "DOMAIN=$1" >> .env.web
+echo "EXTERNAL_IP=$2" >> .env.web
 echo "REVOLT_PUBLIC_URL=https://$1/api" >> .env.web
 echo "VITE_API_URL=https://$1/api" >> .env.web
 echo "VITE_WS_URL=wss://$1/ws" >> .env.web
 echo "VITE_MEDIA_URL=https://$1/autumn" >> .env.web
 echo "VITE_PROXY_URL=https://$1/january" >> .env.web
+echo "TURN_SECRET=$turn_secret" >> .env.web
 
 # hostnames
 echo "[hosts]" > Revolt.toml
@@ -58,7 +63,14 @@ echo "redis:" >> livekit.yml
 echo "  address: redis:6379" >> livekit.yml
 echo "" >> livekit.yml
 echo "turn:" >> livekit.yml
-echo "  enabled: false" >> livekit.yml
+echo "  enabled: true" >> livekit.yml
+echo "  domain: \"$1\"" >> livekit.yml
+echo "  cert_file: \"\"" >> livekit.yml
+echo "  key_file: \"\"" >> livekit.yml
+echo "  tls_port: 0" >> livekit.yml
+echo "  udp_port: 3478" >> livekit.yml
+echo "  external_ip: \"$2\"" >> livekit.yml
+echo "  secret: \"$turn_secret\"" >> livekit.yml
 echo "" >> livekit.yml
 echo "keys:" >> livekit.yml
 echo "  $livekit_key: $livekit_secret" >> livekit.yml

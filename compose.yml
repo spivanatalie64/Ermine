@@ -202,6 +202,26 @@ services:
       exit 0;
       "
 
+  # TURN server for reliable media connectivity
+  coturn:
+    image: docker.io/instrumentisto/coturn
+    restart: always
+    network_mode: host
+    environment:
+      - COTURN_ID=ermine-turn
+      - COTURN_REALM=${DOMAIN:-localhost}
+      - COTURN_SECRET=${TURN_SECRET:-erminesecret}
+      - COTURN_MIN_PORT=50000
+      - COTURN_MAX_PORT=50100
+    command:
+      - -n
+      - --log-file=stdout
+      - --min-port=50000
+      - --max-port=50100
+      - --realm=$${COTURN_REALM}
+      - --static-auth-secret=$${COTURN_SECRET}
+      - --external-ip=$${EXTERNAL_IP}
+
   # Web App
   web:
     image: ghcr.io/stoatchat/for-web:addb6b7
