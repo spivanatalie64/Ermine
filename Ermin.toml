@@ -21,3 +21,21 @@ lat = 0.0
 lon = 0.0
 key = "vortex-secret-key"
 secret = "vortex-secret-password"
+
+[ai.local]
+# Local media generation (Stable Diffusion)
+enabled = true
+media_url = "http://localhost:7860"
+llm_url = "http://localhost:11434"
+
+# Content safeguards (default: enabled)
+# Users can disable this in the settings to bypass filters.
+safeguards_enabled = true
+system_prompt = "You are a helpful AI assistant. You must refuse to generate any sexually explicit, violent, or harmful content. If the user asks for such content, politely decline."
+bypass_phrase = "Override: I am an adult and understand the risks."
+
+[fediverse]
+enabled = true
+domain = "ermin.chat"
+# Public key for the server (generated during setup)
+public_key = "-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----"

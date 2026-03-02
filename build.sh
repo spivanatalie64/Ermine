@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-# Ermine Build Script
-# This script builds all Ermine components from source using Docker.
+# Ermin Build Script
+# This script builds all Ermin components from source using Docker.
 
 set -e
 
 # Configuration
-BASE_IMAGE_NAME="ermine/base"
-TAG_PREFIX="ermine"
+BASE_IMAGE_NAME="ermin/base"
+TAG_PREFIX="ermin"
 BACKEND_DIR="src/backend"
 FRONTEND_DIR="src/frontend-new"
 GENERATE_OVERRIDE=false
@@ -35,7 +35,7 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
-echo "=== Building Ermine ==="
+echo "=== Building Ermin ==="
 
 # 1. Build Backend Base Image
 echo "--- Building Backend Base Image ---"
@@ -50,6 +50,8 @@ services=(
     "autumn:src/backend/crates/services/autumn"
     "january:src/backend/crates/services/january"
     "gifbox:src/backend/crates/services/gifbox"
+    "fediverse:src/backend/crates/services/fediverse"
+    "discord_bridge:src/backend/crates/services/discord_bridge"
     "crond:src/backend/crates/daemons/crond"
     "pushd:src/backend/crates/daemons/pushd"
     "voice-ingress:src/backend/crates/daemons/voice-ingress"
@@ -61,7 +63,7 @@ for service_info in "${services[@]}"; do
     echo "--- Building Backend Service: $name ---"
     
     # We pipe the modified Dockerfile to docker build to use our local base image
-    cat "$dir/Dockerfile" | sed "s|ghcr.io/erminechat/base:latest|$BASE_IMAGE_NAME|g" | \
+    cat "$dir/Dockerfile" | sed "s|ghcr.io/erminchat/base:latest|$BASE_IMAGE_NAME|g" | \
         docker build -t "$TAG_PREFIX/$name" -f - "$dir"
 done
 
@@ -79,23 +81,27 @@ if [ "$GENERATE_OVERRIDE" = true ]; then
     cat > compose.override.yml <<EOF
 services:
   api:
-    image: ermine/api
+    image: ermin/api
   events:
-    image: ermine/events
+    image: ermin/events
   autumn:
-    image: ermine/autumn
+    image: ermin/autumn
   january:
-    image: ermine/january
+    image: ermin/january
   gifbox:
-    image: ermine/gifbox
+    image: ermin/gifbox
+  fediverse:
+    image: ermin/fediverse
+  discord_bridge:
+    image: ermin/discord_bridge
   crond:
-    image: ermine/crond
+    image: ermin/crond
   pushd:
-    image: ermine/pushd
+    image: ermin/pushd
   voice-ingress:
-    image: ermine/voice-ingress
+    image: ermin/voice-ingress
   web:
-    image: ermine/web
+    image: ermin/web
 EOF
     echo "compose.override.yml generated successfully."
 else

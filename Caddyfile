@@ -34,6 +34,27 @@
 		}
 	}
 
+	route /.well-known/webfinger {
+		reverse_proxy http://fediverse:3000
+	}
+
+	route /federation* {
+		uri strip_prefix /federation
+		reverse_proxy http://fediverse:3000 {
+			header_down Location "^/" "/federation/"
+		}
+	}
+
+	route /discord-api* {
+		uri strip_prefix /discord-api
+		reverse_proxy http://discord_bridge:3001
+	}
+
+	route /discord-gateway* {
+		uri strip_prefix /discord-gateway
+		reverse_proxy http://discord_bridge:3001
+	}
+
 	route /vortex* {
 		uri strip_prefix /vortex
 		reverse_proxy http://vortex:8500 {

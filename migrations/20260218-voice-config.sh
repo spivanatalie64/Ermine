@@ -12,10 +12,10 @@ echo "VITE_MEDIA_URL=https://$1/autumn" >> .env.web
 echo "VITE_PROXY_URL=https://$1/january" >> .env.web
 
 # Append the hosts.livekit configuration
-echo "Adding livekit worldwide host to Ermine.toml..."
-echo "" >> Ermine.toml
-echo "[hosts.livekit]" >> Ermine.toml
-echo "worldwide = \"wss://$1/livekit\"" >> Ermine.toml
+echo "Adding livekit worldwide host to Ermin.toml..."
+echo "" >> Ermin.toml
+echo "[hosts.livekit]" >> Ermin.toml
+echo "worldwide = \"wss://$1/livekit\"" >> Ermin.toml
 
 # Create livekit key and secret
 livekit_key=$(openssl rand -hex 6)
@@ -32,14 +32,14 @@ echo "  api_key: $livekit_key" >> livekit.yml
 echo "  urls:" >> livekit.yml
 echo "  - \"http://voice-ingress:8500/worldwide\"" >> livekit.yml
 
-# Append livekit node configuration to Ermine.toml
-echo "Adding livekit node configuration to Ermine.toml..."
-echo "" >> Ermine.toml
-echo "[api.livekit.nodes.worldwide]" >> Ermine.toml
-echo "url = \"http://livekit:7880\"" >> Ermine.toml
-echo "lat = 0.0" >> Ermine.toml
-echo "lon = 0.0" >> Ermine.toml
-echo "key = \"$livekit_key\"" >> Ermine.toml
-echo "secret = \"$livekit_secret\"" >> Ermine.toml
+# Append livekit node configuration to Ermin.toml
+echo "Adding livekit node configuration to Ermin.toml..."
+echo "" >> Ermin.toml
+echo "[api.livekit.nodes.worldwide]" >> Ermin.toml
+echo "url = \"http://livekit:7880\"" >> Ermin.toml
+echo "lat = 0.0" >> Ermin.toml
+echo "lon = 0.0" >> Ermin.toml
+echo "key = \"$livekit_key\"" >> Ermin.toml
+echo "secret = \"$livekit_secret\"" >> Ermin.toml
 
 echo "Done! <3"

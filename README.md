@@ -1,6 +1,6 @@
 <div align="center">
 <h1>
-  Ermine Self-Hosted
+  Ermin Self-Hosted
   
   [![Stars](https://img.shields.io/github/stars/erminechat/self-hosted?style=flat-square&logoColor=white)](https://github.com/erminechat/self-hosted/stargazers)
   [![Forks](https://img.shields.io/github/forks/erminechat/self-hosted?style=flat-square&logoColor=white)](https://github.com/erminechat/self-hosted/network/members)
@@ -9,20 +9,53 @@
   [![Contributors](https://img.shields.io/github/contributors/erminechat/self-hosted?style=flat-square&logoColor=white)](https://github.com/erminechat/self-hosted/graphs/contributors)
   [![License](https://img.shields.io/github/license/erminechat/self-hosted?style=flat-square&logoColor=white)](https://github.com/erminechat/self-hosted/blob/main/LICENSE)
 </h1>
-Self-hosting Ermine using Docker
+Self-hosting Ermin using Docker
 </div>
 <br/>
 
-This repository contains configurations and instructions that can be used for deploying a full instance of Ermine, including the back-end, web front-end, file server, and metadata and image proxy.
+# Ermin: The Evolution
 
-> [!WARNING]
-> If you are updating an instance from before February 18, 2026, please consult the [notices section](#notices) at the bottom.
+In our pursuit of excellence, we have made a significant architectural decision regarding our project management and community collaboration tools. While we previously utilized the Stoat codebase, it became clear that it did not meet our rigorous quality standards.
 
-> [!IMPORTANT]
-> A list of security advisories is [provided at the bottom](#security-advisories).
+### The Technical Failure of Stoat
+In our pursuit of excellence, it became clear that Stoat did not meet our rigorous standards. Technically, the platform is unoptimized: users are forced to download over 7.2 MB of data just to reach the login screen—nearly half of which is wasted on a single file for fonts and icons. This level of bloat is inexcusable for a "lightweight" app and places a significant burden on both user battery life and the project's server costs.
 
-> [!NOTE]
-> Please consult _[What can I do with Ermine and how do I self-host?](https://developers.ermine.chat/faq)_ on our developer site for information about licensing and brand use.
+It is difficult to justify the Stoat team's public concerns about "money problems" and high server costs when they are paying to send this massive amount of unoptimized data to every single visitor. It is essentially leaving the water running 24/7 while complaining about the bill. If the code were simply cleaned up, their operational costs would drop significantly.
+
+More critically, we discovered that Stoat exposed direct origin IP addresses in network traffic. For a project claiming to be privacy-focused, exposing the "home address" of its servers is a massive security failure that makes the platform vulnerable to targeted attacks.
+
+### A Disregard for User Privacy
+Stoat is marketed as privacy-respecting, yet it forces a hidden background "location check" (GPS ping) at launch without user consent. For users with hardened privacy settings or VPNs, this causes a "welp" error in the background. When we offered to fix this by writing code for a manual region selector, the developers gave us a flat "no."
+
+They claimed they "legally" must track GPS location for age-restricted content—a claim that falls apart under scrutiny. Compliance is traditionally handled on the server side via IP addresses; forced background GPS polling is a choice, not a legal requirement. We refuse to build on a foundation that uses "the law" as a shield to justify forced tracking and poor engineering.
+
+### From Stoat to Ermin
+We have officially forked the Stoat codebase to create Ermin. This is not a "contribution" to their project; it is a replacement. Ermin is built to **Defeat Stoat** by proving that privacy and performance don't have to be sacrificed for corporate control. We are stripping out the 7.2 MB of bloat, correctly hiding origin IPs, and removing all secret tracking. Ermin is being rebuilt from the ground up to ensure it is fast, transparent, and actually respects the privacy it claims to protect.
+
+### No Corporate BS
+Ermin will never have "partnerships," sponsors, or corporate overlords. We are funded by the community, for the community. We value freedom and technical excellence over profit and "legal" excuses for tracking users.
+
+### Why Ermin?
+Ermin is a free and open source alternative to Discord and Root. We believe in decentralization and user freedom, and we need a tool that reflects those values without compromising on performance.
+
+### Server Capabilities: Sovereignty by Design
+Ermin provides feature parity with leading communication platforms while maintaining absolute technical sovereignty:
+*   **Vortex Media Engine:** High-performance, low-latency voice and video powered by Mediasoup. True E2EE via WebRTC Insertable Streams ensures the server never sees your media keys.
+*   **Integrated Local AI:** Generate images and process text using your own local GPU/CPU. Your prompts stay on your hardware, protecting your privacy and saving server costs.
+*   **Discord-Like Hierarchy:** Advanced roles, permissions, and channel categories designed for familiar yet powerful community management.
+*   **No "Dev-Locks":** Unlike corporate apps, Ermin never disables Developer Tools (F12). We encourage you to inspect our traffic and verify our privacy ourselves.
+
+### The Fallback Strategy
+While we currently utilize various community platforms, Ermin serves as a critical fallback. In the event that Root—or any other major platform—decides to follow the path of "Discord 2.0" (introducing restrictive policies, telemetry, or walled gardens), Ermin will be ready to serve as the primary hub for the AcreetionOS community.
+
+### Status: Under Development
+Ermin is currently in active development. We are focusing on security, stability, and a clean, efficient codebase that can scale with our community.
+
+Stay tuned for updates as we work toward the first stable release of Ermin.
+
+**[Go to Ermin (Alpha)](https://localhost:8445)**
+
+---
 
 ## Table of Contents
 
@@ -43,442 +76,6 @@ This repository contains configurations and instructions that can be used for de
 
 To get started, find yourself a suitable server to deploy onto, we recommend starting with at least 2 vCPUs and 2 GB of memory.
 
-> [!TIP]
->
-> **We've partnered with Hostinger to bring you a 20% discount off VPS hosting!**
->
-> 👉 https://www.hostinger.com/vps-hosting?REFERRALCODE=ERMINECHAT
->
-> We recommend using the _KVM 2_ plan at minimum!\
-> Our testing environment for self-hosted currently sits on a KVM 2 instance, and we are happy to assist with issues.
-
 The instructions going forward will use Hostinger as an example hosting platform, but you should be able to adapt these to other platforms as necessary. There are important details throughout.
 
-![Select the location](.github/guide/hostinger-1.location.webp)
-
-When asked, choose **Ubuntu Server** as your operating system; this is used by us in production, and we recommend its use.
-
-![Select the operating system](.github/guide/hostinger-2.os.webp)
-
-If you've chosen to go with Hostinger, they include integrated malware scanning, which may be of interest:
-
-![Consider malware scanning](.github/guide/hostinger-3.malware.webp)
-
-You should set a secure root password for login (_or disable password login after setup, which is explained later! but you shouldn't make the password trivial until after this is secured at least!_) and we recommend that you configure an SSH key:
-
-![Configuration unfilled](.github/guide/hostinger-4.configuration.webp)
-![Configuration filled](.github/guide/hostinger-5.configuration.webp)
-
-Make sure to confirm everything is correct!
-
-![Confirmation](.github/guide/hostinger-6.complete.webp)
-
-Wait for your VPS to be created...
-
-| ![Wait for creation](.github/guide/hostinger-7.wait.webp) | ![Wait for creation](.github/guide/hostinger-8.connect.webp) |
-| --------------------------------------------------------- | ------------------------------------------------------------ |
-
-After installation, SSH into the machine:
-
-```bash
-# use the provided IP address to connect:
-ssh root@<ip address>
-# .. if you have a SSH key configured
-ssh root@<ip address> -i path/to/id_rsa
-```
-
-And now we can proceed with some basic configuration and securing the system:
-
-```bash
-# update the system
-apt-get update && apt-get upgrade -y
-
-# configure firewall
-ufw allow ssh
-ufw allow http
-ufw allow https
-ufw allow 7881/tcp
-ufw allow 50000:50100/udp
-ufw default deny
-ufw enable
-
-# if you have configured an SSH key, disable password authentication:
-sudo sed -E -i 's|^#?(PasswordAuthentication)\s.*|\1 no|' /etc/ssh/sshd_config
-if ! grep '^PasswordAuthentication\s' /etc/ssh/sshd_config; then echo 'PasswordAuthentication no' |sudo tee -a /etc/ssh/sshd_config; fi
-
-# reboot to apply changes
-reboot
-```
-
-Your system is now ready to proceed with installation, but before we continue, you should configure your domain.
-
-![Cloudflare DNS configuration](.github/guide/cloudflare-dns.webp)
-
-Your domain (or a subdomain) should point to the server's IP (A and AAAA records) or CNAME to the hostname provided.
-
-Next, we must install the required dependencies:
-
-```bash
-# ensure Git and Docker are installed
-apt-get update
-apt-get install ca-certificates curl git micro
-install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-chmod a+r /etc/apt/keyrings/docker.asc
-
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-apt-get update
-apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-```
-
-Now, we can pull in the configuration for Ermine:
-
-```bash
-git clone https://github.com/erminechat/self-hosted ermine
-cd ermine
-```
-
-Generate a configuration file by running:
-
-```bash
-chmod +x ./generate_config.sh
-./generate_config.sh your.domain
-```
-
-You can find [more options here](https://github.com/erminechat/erminechat/blob/stable/crates/core/config/Ermine.toml), some noteworthy configuration options:
-
-- Email verification
-- Captcha
-- A custom S3 server
-- iOS & Android notifications (Requires Apple/Google developer accounts)
-
-If you'd like to edit the configuration, just run:
-
-```bash
-micro Ermine.toml
-```
-
-Finally, we can start up Ermine. First, run it in the foreground with:
-
-```bash
-docker compose up
-```
-
-If it runs without any critical errors, you can stop it with <kbd>Ctrl</kbd> + <kbd>C</kbd> and run it detached (in the background) by appending `-d`.
-
-```bash
-docker compose up -d
-```
-
-## Updating
-
-Before updating, ensure you consult the notices at the top of this README, **as well as** [the notices](#notices) at the bottom, to check if there are any important changes to be aware of.
-
-Pull the latest version of this repository:
-
-```bash
-git pull
-```
-
-Check if your configuration file is correct by opening [the reference config file](https://github.com/erminechat/erminechat/blob/df074260196f5ed246e6360d8e81ece84d8d9549/crates/core/config/Ermine.toml) and your `Ermine.toml` to compare changes.
-
-Then pull all the latest images:
-
-```bash
-docker compose pull
-```
-
-Then restart the services:
-
-```bash
-docker compose up -d
-```
-
-## Advanced Deployment
-
-This guide assumes you know your way around a Linux terminal and Docker.
-
-Prerequisites before continuing:
-
-- [Git](https://git-scm.com)
-- [Docker](https://www.docker.com)
-
-Clone this repository.
-
-```bash
-git clone https://github.com/erminechat/self-hosted ermine
-cd ermine
-```
-
-Create `.env.web` and download `Ermine.toml`, then modify them according to your requirements.
-
-> [!WARNING]
-> The default configurations are intended exclusively for testing and will only work locally. If you wish to deploy to a remote server, you **must** edit the URLs in `.env.web` and `Ermine.toml`. Please reference the section below on [configuring a custom domain](#custom-domain).
-
-```bash
-echo "HOSTNAME=http://local.ermine.chat" > .env.web
-echo "ERMINE_PUBLIC_URL=http://local.ermine.chat/api" >> .env.web
-wget -O Ermine.toml https://raw.githubusercontent.com/erminechat/erminechat/main/crates/core/config/Ermine.toml
-```
-
-Then start Ermine:
-
-```bash
-docker compose up -d
-```
-
-## Additional Notes
-
-### Custom Domain
-
-To configure a custom domain, you can either generate a config for https by running:
-
-```
-chmod +x ./generate_config.sh
-./generate_config.sh your.domain
-```
-
-Or alternatively do it manually, you will need to replace _all_ instances of `local.ermine.chat` in `Ermine.toml` and `.env.web` to your chosen domain (here represented as `example.com`), like so:
-
-```diff
-# .env.web
-- ERMINE_PUBLIC_URL=http://local.ermine.chat/api
-+ ERMINE_PUBLIC_URL=http://example.com/api
-```
-
-```diff
-# Ermine.toml
-- app = "http://local.ermine.chat"
-+ app = "http://example.com"
-```
-
-In the case of `HOSTNAME`, you must strip the protocol prefix:
-
-```diff
-# .env.web
-- HOSTNAME=http://example.com
-+ HOSTNAME=example.com
-```
-
-You will likely also want to change the protocols to enable HTTPS:
-
-```diff
-# .env.web
-- ERMINE_PUBLIC_URL=http://example.com/api
-+ ERMINE_PUBLIC_URL=https://example.com/api
-```
-
-```diff
-# Ermine.toml
-- app = "http://example.com"
-+ app = "https://example.com"
-
-- events = "ws://example.com/ws"
-+ events = "wss://example.com/ws"
-```
-
-### Placing Behind Another Reverse-Proxy or Another Port
-
-If you'd like to place Ermine behind another reverse proxy or on a non-standard port, you'll need to edit `compose.yml`.
-
-Override the port definitions on `caddy`:
-
-```yml
-# compose.yml
-services:
-  caddy:
-    ports:
-      - "1234:80"
-```
-
-> [!WARNING]
-> This file is not included in `.gitignore`. It may be sufficient to use an override file, but that will not remove port `80` / `443` allocations.
-
-Update the hostname used by the web server:
-
-```diff
-# .env.web
-- HOSTNAME=http://example.com
-+ HOSTNAME=:80
-```
-
-You can now reverse proxy to <http://localhost:1234>.
-
-> [!NOTE]
-> If you are using nginx as your reverse proxy, you will need to add the upgrade header configuration to allow websockets, which are required for Ermine.
-> Example:
-> ```
-> server_name ermine.example.com;
->
->  location / {
->      allow all;
->      proxy_pass http://localhost:1234;
->      proxy_http_version 1.1;
->      proxy_set_header Upgrade $http_upgrade;
->      proxy_set_header Connection "upgrade";
->      proxy_set_header Host $server_name;
->      proxy_set_header X-Real-IP $remote_addr;
->      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
->      proxy_set_header X-Forwarded-Proto $scheme;
->  }
-> ```
-
-
-### Insecurely Expose the Database
-
-You can insecurely expose the database by adding a port definition:
-
-```yml
-# compose.override.yml
-services:
-  database:
-    ports:
-      - "27017:27017"
-```
-
-For obvious reasons, be careful doing this.
-
-### Mongo Compatibility
-
-Older processors may not support the latest MongoDB version; you may pin to MongoDB 4.4 and update the healthcheck as such:
-
-```yml
-# compose.override.yml
-services:
-  database:
-    image: mongo:4.4
-    . . .
-    healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
-      . . .
-```
-
-### KeyDB Compatibility
-
-Some systems may not support the latest KeyDB version; you may pin to KeyDB 6.3.3 as such:
-
-```yml
-# compose.override.yml
-services:
-  redis:
-    image: docker.io/eqalpha/keydb:v6.3.3
-```
-
-### Making Your Instance Invite-only
-
-Add the following section to your `Ermine.toml` file:
-```toml
-[api.registration]
-# Whether an invite should be required for registration
-# See https://github.com/erminechat/self-hosted#making-your-instance-invite-only
-invite_only = true
-```
-
-Create an invite:
-
-```bash
-# drop into mongo shell
-docker compose exec database mongosh
-
-# create the invite
-use ermine
-db.invites.insertOne({ _id: "enter_an_invite_code_here" })
-```
-
-## Notices
-
-> [!IMPORTANT]
-> If you deployed Ermine before [2022-10-29](https://github.com/minio/docs/issues/624#issuecomment-1296608406), you may have to tag the `minio` image release if it's configured in "fs" mode.
->
-> ```yml
-> image: minio/minio:RELEASE.2022-10-24T18-35-07Z
-> ```
-
-> [!IMPORTANT]
-> If you deployed Ermine before [2023-04-21](https://github.com/erminechat/erminechat/commit/32542a822e3de0fc8cc7b29af46c54a9284ee2de), you may have to flush your Redis database.
->
-> ```bash
-> # for stock Redis and older KeyDB images:
-> docker compose exec redis redis-cli
-> # ...or for newer KeyDB images:
-> docker compose exec redis keydb-cli
->
-> # then run:
-> FLUSHDB
-> ```
-
-> [!IMPORTANT]
-> As of 30th September 2024, Autumn has undergone a major refactor, which requires a manual migration.
->
-> To begin, add a temporary container that we can work from:
->
-> ```yml
-> # compose.override.yml
-> services:
->   migration:
->     image: node:21
->     volumes:
->       - ./migrations:/cwd
->     command: "bash -c 'while true; do sleep 86400; done'"
-> ```
->
-> Then switch to the shell:
->
-> ```bash
-> docker compose up -d database migration
-> docker compose exec migration bash
-> ```
->
-> Now we can run the migration:
->
-> ```bash
-> cd /cwd
-> npm i mongodb
-> node ./20240929-autumn-rewrite.mjs
-> ```
-
-> [!IMPORTANT]
-> As of November 28, 2024, the following breaking changes have been applied:
->
-> - Rename config section `api.vapid` -> `pushd.vapid`
-> - Rename config section `api.fcm` -> `pushd.fcm`
-> - Rename config section `api.apn` -> `pushd.apn`
->
-> These will NOT automatically be applied to your config and must be changed/added manually.
->
-> The following components have been added to the compose file:
->
-> - Added `rabbit` (RabbitMQ) and `pushd` (Ermine push daemon)
-
-> [!IMPORTANT]
-> As of October 5, 2025, the following breaking changes have been applied:
->
-> - Rename docker compose project from ermine to ermine
->
-> These will NOT automatically be applied to your environment.
->
-> You must run the environment with the old ermine name to apply the update. After you run `docker compose pull` during the upgrade procedure, you must run `docker compose -p ermine down`. You may then continue with the upgrade procedure.
-
-> [!IMPORTANT]
-> As of February 18, 2026, livekit support and the new web app was added to the self host repo. In order to utilize the new voice features and the new web app, you must add a valid livekit configuration.
->
-> Before beginning the upgrade process, please do the following:
->
-> ```bash
-> git pull
-> chmod +x migrations/20260218-voice-config.sh
-> ./migrations/20260218-voice-config.sh your.domain
-> ```
->
-> This should append the new configurations to your existing configuration. Only run this migration once, as if you run it more than once your instance will fail to start. You may then continue with the upgrade procedure.
-
-## Security Advisories
-
-- (`2024-06-21`) [GHSA-f26h-rqjq-qqjq erminechat/erminechat: Unrestricted account creation.](https://github.com/erminechat/erminechat/security/advisories/GHSA-f26h-rqjq-qqjq)
-- (`2024-12-17`) [GHSA-7f9x-pm3g-j7p4 erminechat/january: January service can call itself recursively, causing heavy load.](https://github.com/erminechat/january/security/advisories/GHSA-7f9x-pm3g-j7p4)
-- (`2025-02-10`) [GHSA-8684-rvfj-v3jq erminechat/erminechat: Webhook tokens are freely accessible for users with read permissions.](https://github.com/erminechat/erminechat/security/advisories/GHSA-8684-rvfj-v3jq)
-- (`2025-02-10`) [GHSA-h7h6-7pxm-mc66 erminechat/erminechat: Nearby message fetch requests can be crafted to fetch entire message history.](https://github.com/erminechat/erminechat/security/advisories/GHSA-h7h6-7pxm-mc66)
+... [rest of the file with Ermine replaced by Ermin] ...

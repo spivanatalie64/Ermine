@@ -1,4 +1,4 @@
-name: ermine
+name: ermin
 
 services:
   # MongoDB: Database
@@ -48,7 +48,7 @@ services:
     networks:
       default:
         aliases:
-          - ermine-uploads.minio
+          - ermin-uploads.minio
           # legacy support:
           - attachments.minio
           - avatars.minio
@@ -73,7 +73,7 @@ services:
 
   # API server
   api:
-    image: ghcr.io/erminechat/api:v0.11.1
+    image: ghcr.io/erminchat/api:v0.11.1
     environment:
       - ERMINE_UNSAFE_NO_EMAIL=1
       - ERMINE_UNSAFE_NO_CAPTCHA=1
@@ -86,13 +86,13 @@ services:
         condition: service_healthy
     volumes:
       - type: bind
-        source: ./Ermine.toml
-        target: /Ermine.toml
+        source: ./Ermin.toml
+        target: /Ermin.toml
     restart: always
 
   # Events service
   events:
-    image: ghcr.io/erminechat/events:v0.11.1
+    image: ghcr.io/erminchat/events:v0.11.1
     depends_on:
       database:
         condition: service_healthy
@@ -100,13 +100,13 @@ services:
         condition: service_started
     volumes:
       - type: bind
-        source: ./Ermine.toml
-        target: /Ermine.toml
+        source: ./Ermin.toml
+        target: /Ermin.toml
     restart: always
 
   # File server
   autumn:
-    image: ghcr.io/erminechat/file-server:v0.11.1
+    image: ghcr.io/erminchat/file-server:v0.11.1
     depends_on:
       database:
         condition: service_healthy
@@ -114,31 +114,31 @@ services:
         condition: service_started
     volumes:
       - type: bind
-        source: ./Ermine.toml
-        target: /Ermine.toml
+        source: ./Ermin.toml
+        target: /Ermin.toml
     restart: always
 
   # Metadata and image proxy
   january:
-    image: ghcr.io/erminechat/proxy:v0.11.1
+    image: ghcr.io/erminchat/proxy:v0.11.1
     volumes:
       - type: bind
-        source: ./Ermine.toml
-        target: /Ermine.toml
+        source: ./Ermin.toml
+        target: /Ermin.toml
     restart: always
 
   # Tenor proxy
   gifbox:
-    image: ghcr.io/erminechat/gifbox:v0.11.1
+    image: ghcr.io/erminchat/gifbox:v0.11.1
     volumes:
       - type: bind
-        source: ./Ermine.toml
-        target: /Ermine.toml
+        source: ./Ermin.toml
+        target: /Ermin.toml
     restart: always
 
   # Regular task daemon
   crond:
-    image: ghcr.io/erminechat/crond:v0.11.1
+    image: ghcr.io/erminchat/crond:v0.11.1
     depends_on:
       database:
         condition: service_healthy
@@ -146,13 +146,13 @@ services:
         condition: service_started
     volumes:
       - type: bind
-        source: ./Ermine.toml
-        target: /Ermine.toml
+        source: ./Ermin.toml
+        target: /Ermin.toml
     restart: always
 
   # Push notification daemon
   pushd:
-    image: ghcr.io/erminechat/pushd:v0.11.1
+    image: ghcr.io/erminchat/pushd:v0.11.1
     depends_on:
       database:
         condition: service_healthy
@@ -162,13 +162,41 @@ services:
         condition: service_healthy
     volumes:
       - type: bind
-        source: ./Ermine.toml
-        target: /Ermine.toml
+        source: ./Ermin.toml
+        target: /Ermin.toml
+    restart: always
+
+  # Fediverse: ActivityPub & WebFinger service
+  fediverse:
+    build:
+      context: ./src/backend
+      dockerfile: ./crates/services/fediverse/Dockerfile
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - type: bind
+        source: ./Ermin.toml
+        target: /Ermin.toml
+    restart: always
+
+  # Discord Bridge: API compatibility layer
+  discord_bridge:
+    build:
+      context: ./src/backend
+      dockerfile: ./crates/services/discord_bridge/Dockerfile
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      - type: bind
+        source: ./Ermin.toml
+        target: /Ermin.toml
     restart: always
 
   # Vortex: Mediasoup-based voice service
   vortex:
-    image: ghcr.io/erminechat/vortex:latest
+    image: ghcr.io/erminchat/vortex:latest
     restart: always
     depends_on:
       database:
@@ -177,8 +205,8 @@ services:
         condition: service_healthy
     volumes:
       - type: bind
-        source: ./Ermine.toml
-        target: /Ermine.toml
+        source: ./Ermin.toml
+        target: /Ermin.toml
     ports:
       - "8500:8500"
       - "40000-40100:40000-40100/udp"
@@ -195,7 +223,7 @@ services:
         /usr/bin/mc alias set minio http://minio:9000 minioautumn minioautumn;
         echo 'Waiting minio...' && sleep 1;
       done;
-      /usr/bin/mc mb minio/ermine-uploads;
+      /usr/bin/mc mb minio/ermin-uploads;
       exit 0;
       "
 
@@ -205,9 +233,9 @@ services:
     restart: always
     network_mode: host
     environment:
-      - COTURN_ID=ermine-turn
+      - COTURN_ID=ermin-turn
       - COTURN_REALM=${DOMAIN:-localhost}
-      - COTURN_SECRET=${TURN_SECRET:-erminesecret}
+      - COTURN_SECRET=${TURN_SECRET:-erminsecret}
       - COTURN_MIN_PORT=50000
       - COTURN_MAX_PORT=50100
     command:
@@ -221,6 +249,6 @@ services:
 
   # Web App
   web:
-    image: ghcr.io/erminechat/for-web:addb6b7
+    image: ghcr.io/erminchat/for-web:addb6b7
     restart: always
     env_file: .env.web
