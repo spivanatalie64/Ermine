@@ -10,7 +10,7 @@ import { MongoClient } from "mongodb";
  * TODO: if you've used AUTUMN_S3_BUCKET_PREFIX in the past
  *       update the bucket names below to include the prefix
  *
- *       NOTE: update `files.s3.default_bucket` in Revolt.toml!
+ *       NOTE: update `files.s3.default_bucket` in Ermine.toml!
  */
 const BUCKET_MAP = {
   attachments: "attachments",
@@ -41,7 +41,7 @@ async function determineUploaderIdAndUse(f, v, i) {
 
     if (!objectLookup[f.message_id]) {
       objectLookup[f.message_id] = await mongo
-        .db("revolt")
+        .db("ermine")
         .collection("messages")
         .findOne({
           _id: f.message_id,
@@ -69,7 +69,7 @@ async function determineUploaderIdAndUse(f, v, i) {
 
     if (!objectLookup[f.server_id]) {
       objectLookup[f.server_id] = await mongo
-        .db("revolt")
+        .db("ermine")
         .collection("servers")
         .findOne({
           _id: f.server_id,
@@ -96,7 +96,7 @@ async function determineUploaderIdAndUse(f, v, i) {
 
     if (!objectLookup[f.object_id]) {
       objectLookup[f.object_id] = await mongo
-        .db("revolt")
+        .db("ermine")
         .collection("emojis")
         .findOne({
           _id: f.object_id,
@@ -123,7 +123,7 @@ async function determineUploaderIdAndUse(f, v, i) {
 
     if (!objectLookup[f.user_id]) {
       objectLookup[f.user_id] = await mongo
-        .db("revolt")
+        .db("ermine")
         .collection("users")
         .findOne({
           _id: f.user_id,
@@ -163,7 +163,7 @@ async function determineUploaderIdAndUse(f, v, i) {
 
     if (!objectLookup[f.user_id]) {
       objectLookup[f.user_id] = await mongo
-        .db("revolt")
+        .db("ermine")
         .collection("users")
         .findOne({
           _id: f.user_id,
@@ -207,7 +207,7 @@ async function determineUploaderIdAndUse(f, v, i) {
     // then re-run on these!
     if (false) {
       objectLookup[f.object_id] = await mongo
-        .db("revolt")
+        .db("ermine")
         .collection("users")
         .findOne({
           _id: f.object_id,
@@ -230,7 +230,7 @@ async function determineUploaderIdAndUse(f, v, i) {
 
     if (!objectLookup[f.object_id]) {
       objectLookup[f.object_id] = await mongo
-        .db("revolt")
+        .db("ermine")
         .collection("servers")
         .findOne({
           _id: f.object_id,
@@ -246,7 +246,7 @@ async function determineUploaderIdAndUse(f, v, i) {
 
       if (!objectLookup[f.object_id]) {
         objectLookup[f.object_id] = await mongo
-          .db("revolt")
+          .db("ermine")
           .collection("channels")
           .findOne({
             _id: f.object_id,
@@ -264,7 +264,7 @@ async function determineUploaderIdAndUse(f, v, i) {
         server = objectLookup[serverId];
 
         if (!server) {
-          server = await mongo.db("revolt").collection("servers").findOne({
+          server = await mongo.db("ermine").collection("servers").findOne({
             _id: serverId,
           });
 
@@ -319,7 +319,7 @@ const dirs = [
 
 // === add `used_for` field to files
 const files_pt1 = await mongo
-  .db("revolt")
+  .db("ermine")
   .collection("attachments")
   .find({
     $or: [
@@ -347,7 +347,7 @@ for (const file of files_pt1) {
   console.info(i++, files_pt1.length, file);
   const meta = determineUploaderIdAndUse(file, file.tag, i);
   if (meta) {
-    await mongo.db("revolt").collection("attachments").updateOne(
+    await mongo.db("ermine").collection("attachments").updateOne(
       {
         _id: file._id,
       },
@@ -360,7 +360,7 @@ for (const file of files_pt1) {
 
 // === set hash to id and create relevant objects
 const files_pt2 = await mongo
-  .db("revolt")
+  .db("ermine")
   .collection("attachments")
   .find({
     hash: {
@@ -370,7 +370,7 @@ const files_pt2 = await mongo
   .toArray();
 
 await mongo
-  .db("revolt")
+  .db("ermine")
   .collection("attachment_hashes")
   .insertMany(
     files_pt2.map((file) => ({
@@ -391,7 +391,7 @@ await mongo
 
 for (const file of files_pt2) {
   await mongo
-    .db("revolt")
+    .db("ermine")
     .collection("attachments")
     .updateOne(
       {

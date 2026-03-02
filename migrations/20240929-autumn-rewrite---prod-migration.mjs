@@ -1,11 +1,11 @@
-// THIS FILE IS TAILORED TO STOAT PRODUCTION
+// THIS FILE IS TAILORED TO ERMINE PRODUCTION
 // MIGRATING FROM A BACKUP & EXISTING CDN NODE
 // INTO BACKBLAZE B2
 //
 // THIS IS ONLY INCLUDED FOR REFERENCE PURPOSES
 
-// NODE_EXTRA_CA_CERTS=~/projects/revolt-admin-panel/revolt.crt node index.mjs
-// NODE_EXTRA_CA_CERTS=/cwd/revolt.crt node /cwd/index.mjs
+// NODE_EXTRA_CA_CERTS=~/projects/ermine-admin-panel/ermine.crt node index.mjs
+// NODE_EXTRA_CA_CERTS=/cwd/ermine.crt node /cwd/index.mjs
 
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import { createCipheriv, createHash, randomBytes } from "node:crypto";
@@ -104,7 +104,7 @@ async function determineUploaderIdAndUse(f, v, i) {
 
     if (!objectLookup[f.message_id]) {
       objectLookup[f.message_id] = await mongo
-        .db("revolt")
+        .db("ermine")
         .collection("messages")
         .findOne({
           _id: f.message_id,
@@ -132,7 +132,7 @@ async function determineUploaderIdAndUse(f, v, i) {
 
     if (!objectLookup[f.server_id]) {
       objectLookup[f.server_id] = await mongo
-        .db("revolt")
+        .db("ermine")
         .collection("servers")
         .findOne({
           _id: f.server_id,
@@ -159,7 +159,7 @@ async function determineUploaderIdAndUse(f, v, i) {
 
     if (!objectLookup[f.object_id]) {
       objectLookup[f.object_id] = await mongo
-        .db("revolt")
+        .db("ermine")
         .collection("emojis")
         .findOne({
           _id: f.object_id,
@@ -186,7 +186,7 @@ async function determineUploaderIdAndUse(f, v, i) {
 
     if (!objectLookup[f.user_id]) {
       objectLookup[f.user_id] = await mongo
-        .db("revolt")
+        .db("ermine")
         .collection("users")
         .findOne({
           _id: f.user_id,
@@ -226,7 +226,7 @@ async function determineUploaderIdAndUse(f, v, i) {
 
     if (!objectLookup[f.user_id]) {
       objectLookup[f.user_id] = await mongo
-        .db("revolt")
+        .db("ermine")
         .collection("users")
         .findOne({
           _id: f.user_id,
@@ -270,7 +270,7 @@ async function determineUploaderIdAndUse(f, v, i) {
     // then re-run on these!
     if (false) {
       objectLookup[f.object_id] = await mongo
-        .db("revolt")
+        .db("ermine")
         .collection("users")
         .findOne({
           _id: f.object_id,
@@ -293,7 +293,7 @@ async function determineUploaderIdAndUse(f, v, i) {
 
     if (!objectLookup[f.object_id]) {
       objectLookup[f.object_id] = await mongo
-        .db("revolt")
+        .db("ermine")
         .collection("servers")
         .findOne({
           _id: f.object_id,
@@ -309,7 +309,7 @@ async function determineUploaderIdAndUse(f, v, i) {
 
       if (!objectLookup[f.object_id]) {
         objectLookup[f.object_id] = await mongo
-          .db("revolt")
+          .db("ermine")
           .collection("channels")
           .findOne({
             _id: f.object_id,
@@ -327,7 +327,7 @@ async function determineUploaderIdAndUse(f, v, i) {
         server = objectLookup[serverId];
 
         if (!server) {
-          server = await mongo.db("revolt").collection("servers").findOne({
+          server = await mongo.db("ermine").collection("servers").findOne({
             _id: serverId,
           });
 
@@ -386,7 +386,7 @@ for (const dir of dirs) {
 
   // UPLOAD FROM DATABASE FILE LISTING:
   const files = await mongo
-    .db("revolt")
+    .db("ermine")
     .collection("attachments")
     .find(
       {
@@ -431,7 +431,7 @@ for (const dir of dirs) {
         }
 
         const doc = await mongo
-          .db("revolt")
+          .db("ermine")
           .collection("attachments")
           .findOne({
             _id: file,
@@ -475,7 +475,7 @@ for (const dir of dirs) {
               processed_ids.add(file);
             }
             console.log(i, "File not found!");
-            await mongo.db("revolt").collection("logs").insertOne({
+            await mongo.db("ermine").collection("logs").insertOne({
               type: "missingFile",
               desc: "File doesn't exist!",
               file,
@@ -500,7 +500,7 @@ for (const dir of dirs) {
 
         // merge existing
         const existingHash = await mongo
-          .db("revolt")
+          .db("ermine")
           .collection("attachment_hashes")
           .findOne({
             _id: hash,
@@ -510,7 +510,7 @@ for (const dir of dirs) {
           console.info(i, "Hash already uploaded, merging!");
 
           await mongo
-            .db("revolt")
+            .db("ermine")
             .collection("attachments")
             .updateOne(
               {
@@ -525,7 +525,7 @@ for (const dir of dirs) {
               }
             );
 
-          await mongo.db("revolt").collection("logs").insertOne({
+          await mongo.db("ermine").collection("logs").insertOne({
             type: "mergeHash",
             desc: "Merged an existing file!",
             hash: existingHash._id,
@@ -554,7 +554,7 @@ for (const dir of dirs) {
         while (retry) {
           try {
             const urlResp = await b2.getUploadUrl({
-              bucketId: "---", // revolt-uploads
+              bucketId: "---", // ermine-uploads
             });
 
             await b2.uploadFile({
@@ -566,7 +566,7 @@ for (const dir of dirs) {
             });
 
             await mongo
-              .db("revolt")
+              .db("ermine")
               .collection("attachment_hashes")
               .insertOne({
                 _id: hash,
@@ -574,7 +574,7 @@ for (const dir of dirs) {
 
                 created_at: new Date(), // TODO on all
 
-                bucket_id: "revolt-uploads",
+                bucket_id: "ermine-uploads",
                 path: hash,
                 iv: iv.toString("base64"),
 
@@ -584,7 +584,7 @@ for (const dir of dirs) {
               });
 
             await mongo
-              .db("revolt")
+              .db("ermine")
               .collection("attachments")
               .updateOne(
                 {
@@ -612,7 +612,7 @@ for (const dir of dirs) {
               console.error(i, err.response.status, "ERROR RETRYING");
 
               await mongo
-                .db("revolt")
+                .db("ermine")
                 .collection("logs")
                 .insertOne({
                   type: "upload503",
