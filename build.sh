@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Stoat Build Script
+# Ermine Build Script
 # This script builds all Ermine components from source using Docker.
 
 set -e
@@ -61,7 +61,7 @@ for service_info in "${services[@]}"; do
     echo "--- Building Backend Service: $name ---"
     
     # We pipe the modified Dockerfile to docker build to use our local base image
-    cat "$dir/Dockerfile" | sed "s|ghcr.io/stoatchat/base:latest|$BASE_IMAGE_NAME|g" | \
+    cat "$dir/Dockerfile" | sed "s|ghcr.io/erminechat/base:latest|$BASE_IMAGE_NAME|g" | \
         docker build -t "$TAG_PREFIX/$name" -f - "$dir"
 done
 

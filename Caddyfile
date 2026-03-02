@@ -34,17 +34,10 @@
 		}
 	}
 
-	route /livekit* {
-		uri strip_prefix /livekit
-		reverse_proxy http://livekit:7880 {
-			header_down Location "^/" "/livekit/"
-		}
-	}
-
-	route /ingress* {
-		uri strip_prefix /ingress
-		reverse_proxy http://voice-ingress:8500 {
-			header_down Location "^/" "/ingress/"
+	route /vortex* {
+		uri strip_prefix /vortex
+		reverse_proxy http://vortex:8500 {
+			header_down Location "^/" "/vortex/"
 		}
 	}
 
