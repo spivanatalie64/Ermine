@@ -8,3 +8,6 @@ Revolt.toml.old
 livekit.yml.old
 
 compose.override.yml
+*.gguf
+llama-server
+llama.cpp/
