@@ -1,0 +1,6 @@
+[submodule "src/backend"]
+	path = src/backend
+	url = https://github.com
+[submodule "src/frontend-new"]
+	path = src/frontend-new
+	url = https://github.com
