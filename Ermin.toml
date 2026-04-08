@@ -1,41 +1,26 @@
 [hosts]
-app = "https://localhost:8445"
-api = "https://localhost:8445/api"
-events = "wss://localhost:8445/ws"
-autumn = "https://localhost:8445/autumn"
-january = "https://localhost:8445/january"
+app = "https://"
+api = "https:///api"
+events = "wss:///ws"
+autumn = "https:///autumn"
+january = "https:///january"
 
-[hosts.vortex]
-worldwide = "wss://localhost:8445/vortex"
+[hosts.livekit]
+worldwide = "wss:///livekit"
 
 [pushd.vapid]
-private_key = "LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCk1IY0NBUUVFSUlrbXlwV0tyNkNidy9sd3pQVUhmT1BUYW02ejhrd3kyOWV0VURjK1dlNmJvQW9HQ0NxR1NNNDkKQXdFSG9VUURRZ0FFZ0kzT2Z1bkQvdXlUdlhweVhXa3NzQXVTZDJnUTFjS3JEeWR2ZnNpMmMwM01qNnAzS0g3cgpjL3VtMDZpbjluczJONnd5WldUdy9rUzlra1YrdUlpVGd3PT0KLS0tLS1FTkQgRUMgUFJJVkFURSBLRVktLS0tLQo"
-public_key = "BICNzn7pw_7sk716cl1pLLALkndoENXCqw8nb37ItnNNzI-qdyh-63P7ptOop_Z7NjesMmVk8P5EvZJFfriIk4M"
+# VAPID keys removed from repository. Set these in environment or a secrets store.
+private_key = ""
+public_key = ""
 
 [files]
-encryption_key = "4Y1gTG6Zt6ahy+2IFQMlFiez+7DBXfjJ9jEkxkERH60="
+# Encryption key removed from repository. Set FILES_ENCRYPTION_KEY in environment or secrets store.
+encryption_key = ""
 
-[api.vortex.nodes.worldwide]
-url = "http://vortex:8500"
+[api.livekit.nodes.worldwide]
+url = "http://livekit:7880"
 lat = 0.0
 lon = 0.0
-key = "vortex-secret-key"
-secret = "vortex-secret-password"
-
-[ai.local]
-# Local media generation (Stable Diffusion)
-enabled = true
-media_url = "http://localhost:7860"
-llm_url = "http://localhost:11434"
-
-# Content safeguards (default: enabled)
-# Users can disable this in the settings to bypass filters.
-safeguards_enabled = true
-system_prompt = "You are a helpful AI assistant. You must refuse to generate any sexually explicit, violent, or harmful content. If the user asks for such content, politely decline."
-bypass_phrase = "Override: I am an adult and understand the risks."
-
-[fediverse]
-enabled = true
-domain = "ermin.chat"
-# Public key for the server (generated during setup)
-public_key = "-----BEGIN PUBLIC KEY-----\n...\n-----END PUBLIC KEY-----"
+# LiveKit credentials removed. Set LIVEKIT_KEY and LIVEKIT_SECRET in environment or secrets manager.
+key = ""
+secret = ""
