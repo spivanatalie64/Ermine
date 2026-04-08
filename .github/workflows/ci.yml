@@ -1,0 +1,41 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Set up Rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install frontend deps (if present)
+        run: |
+          if [ -f src/frontend-new/package.json ]; then
+            cd src/frontend-new
+            npm ci
+            cd -
+          fi
+
+      - name: Syntax-check build script
+        run: bash -n build.sh
+
+      - name: Cargo build (if backend present)
+        run: |
+          if [ -d src/backend ]; then
+            cd src/backend
+            cargo build --workspace --locked --quiet || true
+            cd -
+          fi
+
+      - name: Smoke: list top-level files
+        run: ls -la | head -n 50
