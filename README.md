@@ -79,3 +79,14 @@ To get started, find yourself a suitable server to deploy onto, we recommend sta
 The instructions going forward will use Hostinger as an example hosting platform, but you should be able to adapt these to other platforms as necessary. There are important details throughout.
 
 ... [rest of the file with Ermine replaced by Ermin] ...
+---
+
+## 🤖 Pullfrog AI Review
+
+This repository uses **Pullfrog AI** to automatically review pull requests.
+
+Pullfrog is an AI-powered code review agent that analyzes every PR for code quality,
+security issues, performance problems, and best practice violations. Reviews appear
+as inline PR comments and checks. Trigger manually by commenting `@pullfrog` on any PR.
+
+Powered by OpenRouter.
